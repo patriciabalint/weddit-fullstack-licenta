@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Neacademia';
+  src: url('./assets/fonts/NeacademiaDisplay-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Neacademia';
+  src: url('./assets/fonts/NeacademiaDisplay-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'AmeliaGiovani';
+  src: url('../fonts/AmeliaGiovani.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+/* Fonturi Tailwind */
+* {
+  font-family: 'Neacademia', serif;
+}
+* {
+  font-family: 'AmeliaGiovani', serif;
+}
+.font-neacademia {
+  font-family: 'Neacademia', serif;
+}
+
+.font-script {
+  font-family: 'English Script', cursive;
+}
+
+/* Stiluri adiționale */
+a.active hr {
+  display: block;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  a.active {
+    background-color: black;
+    color: white;
+  }
+}
