@@ -89,12 +89,11 @@ const adminLogin = async (req, res) => {
       email === process.env.ADMIN_EMAIL &&
       password === process.env.ADMIN_PASSWORD
     ) {
-      // ATENTIE: Aici token-ul nu contine un user ID.
-      // Daca vrei ca admin-ul sa aiba un userId in frontend,
-      // va trebui sa generezi un ID unic pentru admin sau sa folosesti email-ul.
-      // Pentru moment, ramane asa cum era in codul tau initial.
-      const token = jwt.sign({ email, type: 'admin' }, process.env.JWT_SECRET); // Am adaugat un payload de exemplu
-      res.json({ success: true, token, userId: 'admin' }); // <-- Am adaugat un userId placeholder pentru admin
+      const token = jwt.sign({ email, role: 'admin' }, process.env.JWT_SECRET, {
+        expiresIn: '1d',
+      });
+
+      res.json({ success: true, token, userId: 'admin' });
     } else {
       res.json({ success: false, message: 'Invalid credentials' });
     }

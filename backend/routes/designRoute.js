@@ -1,74 +1,70 @@
 import express from 'express';
 import authMiddleware from '../middleware/auth.js';
 import Design from '../models/designModel.js';
+
 const designRouter = express.Router();
 
-// Rută pentru salvarea/actualizarea designului
 designRouter.post('/save', authMiddleware, async (req, res) => {
+  const userId = req.user?.id || req.userId; // Flexibil, în funcție de middleware
+  const { productId, designData } = req.body; // Schimbat din fields => designData
+
+  if (!userId || !productId || !designData) {
+    return res.status(400).json({
+      success: false,
+      message: 'Date insuficiente pentru salvarea designului.',
+    });
+  }
+
   try {
-    const userId = req.body.userId; // userId vine de la middleware-ul de autentificare
-    const { productId, fields } = req.body;
-
-    // Validare simplă
-    if (!userId || !productId || !fields) {
-      return res.json({
-        success: false,
-        message: 'Date insuficiente pentru salvarea designului.',
-      });
-    }
-
-    // Căutăm un design existent pentru user și produs
-    // findOneAndUpdate va căuta un document care se potrivește cu criteriile
-    // dacă nu-l găsește, îl va crea (opțiunea upsert: true)
     const design = await Design.findOneAndUpdate(
-      { userId: userId, productId: productId },
-      { fields: fields, updatedAt: Date.now() }, // Setăm noile câmpuri și data actualizării
-      { new: true, upsert: true, setDefaultsOnInsert: true } // new: true returnează documentul modificat, upsert: true creează dacă nu există
+      { userId, productId },
+      { designData },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
     );
 
-    res.json({
+    res.status(200).json({
       success: true,
       message: 'Design salvat cu succes!',
       designId: design._id,
     });
   } catch (error) {
     console.error('Eroare la salvarea designului:', error);
-    res.json({ success: false, message: 'Eroare la salvarea designului.' });
+    res
+      .status(500)
+      .json({ success: false, message: 'Eroare la salvarea designului.' });
   }
 });
 
-// Rută pentru încărcarea designului
 designRouter.post('/load', authMiddleware, async (req, res) => {
-  try {
-    const userId = req.body.userId; // userId vine de la middleware-ul de autentificare
-    const { productId } = req.body;
+  const userId = req.user?.id || req.userId;
+  const { productId } = req.body;
 
-    // Validare
-    if (!userId || !productId) {
-      return res.json({
-        success: false,
-        message: 'Date insuficiente pentru încărcarea designului.',
-      });
-    }
-
-    const design = await Design.findOne({
-      userId: userId,
-      productId: productId,
+  if (!userId || !productId) {
+    return res.status(400).json({
+      success: false,
+      message: 'Date insuficiente pentru încărcarea designului.',
     });
+  }
+
+  try {
+    const design = await Design.findOne({ userId, productId });
 
     if (design) {
-      res.json({ success: true, fields: design.fields });
-    } else {
-      // Dacă nu găsim un design, trimitem un array gol sau o stare default
-      res.json({
+      res.status(200).json({
         success: true,
-        fields: [],
+        designData: design.designData,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
         message: 'Nu s-a găsit niciun design salvat pentru acest produs.',
       });
     }
   } catch (error) {
     console.error('Eroare la încărcarea designului:', error);
-    res.json({ success: false, message: 'Eroare la încărcarea designului.' });
+    res
+      .status(500)
+      .json({ success: false, message: 'Eroare la încărcarea designului.' });
   }
 });
 

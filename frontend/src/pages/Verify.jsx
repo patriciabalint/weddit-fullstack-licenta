@@ -7,7 +7,7 @@ import axios from 'axios';
 
 const Verify = () => {
   const { navigate, token, setCartItems, backendUrl } = useContext(ShopContext);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const success = searchParams.get('success');
   const orderId = searchParams.get('orderId');
@@ -21,7 +21,7 @@ const Verify = () => {
       const response = await axios.post(
         backendUrl + '/api/order/verifyStripe',
         { success, orderId },
-        { headers: { token } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (response.data.success) {
@@ -37,8 +37,10 @@ const Verify = () => {
   };
 
   useEffect(() => {
-    verifyPayment();
-  }, [token]);
+    if (token && success && orderId) {
+      verifyPayment();
+    }
+  }, [token, success, orderId]);
 
   return <div></div>;
 };

@@ -16,10 +16,8 @@
   font-style: italic;
 }
 @font-face {
-  font-family: 'AmeliaGiovani';
-  src: url('../fonts/AmeliaGiovani.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
+  font-family: 'Amelia Giovani';
+  src: url('./fonts/Amelia Giovani.ttf') format('truetype');
 }
 /* Fonturi Tailwind */
 * {

@@ -51,11 +51,21 @@ const Cart = () => {
   };
 
   const handleProceedToCheckout = async () => {
-    try {
-      const orderItems = Object.keys(cartItems)
-        .map((id) => products.find((p) => p._id === id))
-        .filter(Boolean);
+    if (!token) {
+      toast.error('Te rugăm să te autentifici înainte de a finaliza comanda.');
+      return;
+    }
 
+    const orderItems = Object.keys(cartItems)
+      .map((id) => products.find((p) => p._id === id))
+      .filter(Boolean);
+
+    if (orderItems.length === 0) {
+      toast.error('Coșul este gol.');
+      return;
+    }
+
+    try {
       const orderData = {
         address: formData,
         items: orderItems,
@@ -65,7 +75,7 @@ const Cart = () => {
       const response = await axios.post(
         backendUrl + '/api/order/stripe',
         orderData,
-        { headers: { token } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (response.data.success) {
@@ -86,29 +96,29 @@ const Cart = () => {
       </div>
 
       <div>
-        {cartData.map((item, index) => {
+        {cartData.map((item) => {
           const productData = products.find(
             (product) => product._id === item._id
           );
 
           return (
             <div
-              key={index}
+              key={item._id}
               className="py-4 border-t border-b text-gray-700 grid grid-cols-[4fr_0.5fr] sm:grid-cols-[4fr_0.5fr] items-center gap-4"
             >
               <div className="flex items-start gap-6">
                 <img
                   className="w-16 sm:w-20"
-                  src={productData.image[0]}
-                  alt=""
+                  src={productData?.image?.[0] || '/placeholder.png'}
+                  alt={productData?.name || 'product'}
                 />
                 <div>
                   <p className="text-xs sm:text-lg font-medium">
-                    {productData.name}
+                    {productData?.name}
                   </p>
                   <div className="flex items-center gap-5 mt-2 text-accent">
                     <p>
-                      {productData.price}
+                      {productData?.price}
                       <span className="text-[12px] ml-1">{currency}</span>
                     </p>
                   </div>
@@ -124,10 +134,12 @@ const Cart = () => {
             </div>
           );
         })}
+        {cartData.length === 0 && (
+          <p className="text-center text-gray-500">Coșul este gol.</p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-20 md:ml-8">
-        {/* FORMULAR */}
         <div className="flex flex-col gap-4 w-full">
           <h2 className="text-xl sm:text-2xl text-gray-600 my-3">
             Completează informațiile de contact:
@@ -163,7 +175,6 @@ const Cart = () => {
           />
         </div>
 
-        {/* CART TOTAL + BUTTON */}
         <div className="w-full sm:w-[500px] mt-6 ">
           <CartTotal />
           <div className="w-full">

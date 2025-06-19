@@ -5,11 +5,18 @@ import Stripe from 'stripe';
 const currency = 'ron';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Stripe Order
+// Creare comandă + Stripe session
 const placeOrderStripe = async (req, res) => {
   try {
-    const { userId, items, amount, address } = req.body;
+    const { items, amount, address } = req.body;
+    const userId = req.user.id; // Obținut din middleware-ul de auth
     const { origin } = req.headers;
+
+    if (!userId || !items || !amount) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Missing order data' });
+    }
 
     const orderData = {
       userId,
@@ -21,8 +28,7 @@ const placeOrderStripe = async (req, res) => {
       date: Date.now(),
     };
 
-    const newOrder = new orderModel(orderData);
-    await newOrder.save();
+    const newOrder = await orderModel.create(orderData);
 
     const line_items = items.map((item) => ({
       price_data: {
@@ -42,56 +48,75 @@ const placeOrderStripe = async (req, res) => {
 
     res.json({ success: true, session_url: session.url });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
+    console.error('placeOrderStripe error:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// Stripe Verification
+// Verificare Stripe + actualizare comandă + reset coș
 const verifyStripe = async (req, res) => {
-  const { orderId, success, userId } = req.body;
   try {
+    const { orderId, success } = req.body;
+
+    if (!orderId || !success) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Missing verification data' });
+    }
+
+    const order = await orderModel.findById(orderId);
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Order not found' });
+    }
+
     if (success === 'true') {
-      await orderModel.findByIdAndUpdate(orderId, { payment: true });
-      await userModel.findByIdAndUpdate(userId, { cartData: {} });
-      res.json({ success: true });
+      order.payment = true;
+      await order.save();
+
+      await userModel.findByIdAndUpdate(order.userId, { cartData: {} });
+
+      return res.json({ success: true });
     } else {
       await orderModel.findByIdAndDelete(orderId);
-      res.json({ success: false });
+      return res.json({ success: false });
     }
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
+    console.error('verifyStripe error:', error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// Admin + User Utilities
+// Admin: toate comenzile
 const allOrders = async (req, res) => {
   try {
     const orders = await orderModel.find({});
     res.json({ success: true, orders });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
+// User: comenzile proprii
 const userOrders = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.user.id; // Preluat din token
     const orders = await orderModel.find({ userId });
     res.json({ success: true, orders });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
+// Admin: update status comandă
 const updateStatus = async (req, res) => {
   try {
     const { orderId, status } = req.body;
     await orderModel.findByIdAndUpdate(orderId, { status });
     res.json({ success: true, message: 'Status Updated' });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 

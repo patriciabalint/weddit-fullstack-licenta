@@ -36,6 +36,7 @@ import img_contact from './img_contact.png';
 import panou from './panou.png';
 import pencil_icon from './pencil_icon.png';
 import save_icon from './save_icon.png';
+import download_icon from './download_icon.png';
 
 export const assets = {
   logo2,
@@ -70,6 +71,7 @@ export const assets = {
   panou,
   pencil_icon,
   save_icon,
+  download_icon,
 };
 
 export const products = [

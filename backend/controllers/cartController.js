@@ -1,48 +1,53 @@
 import userModel from '../models/userModel.js';
 
-// Adaugă un produs în coș (fără cantitate)
 const addToCart = async (req, res) => {
   try {
-    const { userId, itemId } = req.body;
+    const userId = req.user.id;
+    const { itemId } = req.body;
 
     const userData = await userModel.findById(userId);
-    let cartData = userData.cartData || {};
+    if (!userData) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'User not found' });
+    }
 
-    cartData[itemId] = true; // ✅ doar îl marchezi ca fiind în coș
+    let cartData = userData.cartData || {};
+    cartData[itemId] = true;
 
     await userModel.findByIdAndUpdate(userId, { cartData });
 
-    res.json({ success: true, message: 'Added to cart' });
+    res.status(200).json({ success: true, message: 'Added to cart' });
   } catch (error) {
     console.log(error);
-    res.json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// Update cart — opțional poți să îl păstrezi, dar nu e necesar
 const updateCart = async (req, res) => {
-  try {
-    // Funcția asta devine inutilă, dar o poți păstra goală sau cu un mesaj
-    res.json({ success: false, message: 'Not implemented in digital mode' });
-  } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
-  }
+  res
+    .status(501)
+    .json({ success: false, message: 'Not implemented in digital mode' });
 };
 
-// Returnează coșul actual al utilizatorului
 const getUserCart = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.user.id;
 
     const userData = await userModel.findById(userId);
-    let cartData = userData.cartData || {};
+    if (!userData) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'User not found' });
+    }
 
-    res.json({ success: true, cartData });
+    let cartData = userData.cartData || {};
+    res.status(200).json({ success: true, cartData });
   } catch (error) {
     console.log(error);
-    res.json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
 export { addToCart, updateCart, getUserCart };
+``;

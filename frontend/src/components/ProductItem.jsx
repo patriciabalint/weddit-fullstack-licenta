@@ -21,7 +21,7 @@ const ProductItem = ({ id, image, name, price }) => {
       </div>
 
       <div className="flex justify-between items-center pt-3 pb-1">
-        <p className="text-[16px] font-regular uppercase">{name}</p>
+        <p className="text-[17px] font-regular ">{name}</p>
         <p className="text-[16px] text-accent font-regular uppercase">
           {price}
           <span className="text-[12px] ml-1">{currency}</span>

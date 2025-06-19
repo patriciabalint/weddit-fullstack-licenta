@@ -2,53 +2,77 @@ import { useContext, useEffect, useState } from 'react';
 import { ShopContext } from '../context/ShopContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [currentState, setCurrentState] = useState('Login');
-  const { token, setToken, navigate, backendUrl } = useContext(ShopContext);
+
+  const { setToken, setUserId, backendUrl } = useContext(ShopContext);
 
   const [name, setName] = useState('');
-  const [password, setPasword] = useState('');
+  const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
 
+  const navigate = useNavigate(); // Inițializăm useNavigate aici
+
   const onSubmitHandler = async (event) => {
-    event.preventDefault();
+    event.preventDefault(); // Oprește reîncărcarea paginii
+
     try {
+      let response;
       if (currentState === 'Sign Up') {
-        const response = await axios.post(backendUrl + '/api/user/register', {
+        response = await axios.post(backendUrl + '/api/user/register', {
           name,
           email,
           password,
         });
-        if (response.data.success) {
-          setToken(response.data.token);
-          localStorage.setItem('token', response.data.token);
-        } else {
-          toast.error(response.data.message);
-        }
       } else {
-        const response = await axios.post(backendUrl + '/api/user/login', {
+        // Login
+        response = await axios.post(backendUrl + '/api/user/login', {
           email,
           password,
         });
-        if (response.data.success) {
-          setToken(response.data.token);
-          localStorage.setItem('token', response.data.token);
-        } else {
-          toast.error(response.data.message);
-        }
+      }
+
+      if (response.data.success) {
+        setToken(response.data.token);
+        localStorage.setItem('token', response.data.token);
+
+        // --- LINIILE CRUCIALE PENTRU userId ---
+        setUserId(response.data.userId); // Setează userId în context
+        localStorage.setItem('userId', response.data.userId); // Salvează userId în localStorage
+        // --- END userId MODIFICARE ---
+
+        toast.success(
+          currentState === 'Login'
+            ? 'Autentificare reușită!'
+            : 'Înregistrare reușită!'
+        );
+        navigate('/'); // Redirecționează către pagina principală după succes
+      } else {
+        toast.error(response.data.message);
       }
     } catch (error) {
-      console.log(error);
-      toast.error(error.message);
+      console.error('Authentication error:', error); // Folosește console.error pentru erori
+      toast.error(
+        error.response?.data?.message ||
+          error.message ||
+          'A apărut o eroare necunoscută.'
+      );
     }
   };
 
   useEffect(() => {
-    if (token) {
-      navigate('/');
+    // Verifică dacă tokenul există deja în localStorage la încărcarea componentei
+    const storedToken = localStorage.getItem('token');
+    const storedUserId = localStorage.getItem('userId');
+
+    if (storedToken && storedUserId) {
+      setToken(storedToken);
+      setUserId(storedUserId);
+      navigate('/'); // Redirecționează dacă ești deja autentificat
     }
-  }, [token]);
+  }, [setToken, setUserId, navigate]); // Adaugă setToken, setUserId și navigate ca dependențe
 
   return (
     <div className="pt-10 border-t border-gray-200">
@@ -82,7 +106,7 @@ const Login = () => {
           required
         />
         <input
-          onChange={(e) => setPasword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
           value={password}
           type="password"
           className="w-full px-3 py-2 border border-[#7A8897]"
@@ -90,22 +114,25 @@ const Login = () => {
           required
         />
 
-        <button className=" w-full px-3 py-2 bg-[#6385A8] text-white uppercase font-light px-10 py-2 mt-2">
+        <button
+          type="submit"
+          className="w-full px-3 py-2 bg-[#6385A8] text-white uppercase font-light px-10 py-2 mt-2"
+        >
           {currentState === 'Login' ? 'Sign In' : 'Sign Up'}
         </button>
         <div className="w-full flex justify-between text-sm text-muted mt-[-4px]">
-          <p className=" cursor-pointer">Forgot your password?</p>
+          <p className="cursor-pointer">Forgot your password?</p>
           {currentState === 'Login' ? (
             <p
               onClick={() => setCurrentState('Sign Up')}
-              className=" cursor-pointer"
+              className="cursor-pointer"
             >
               Create account
             </p>
           ) : (
             <p
               onClick={() => setCurrentState('Login')}
-              className=" cursor-pointer"
+              className="cursor-pointer"
             >
               Login Here
             </p>

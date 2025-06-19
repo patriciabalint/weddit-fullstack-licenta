@@ -11,7 +11,7 @@ const OurPolicy = () => {
             alt="icon"
           />
           <p className="text-[#416387] uppercase text-[18px] font-medium mb-3">
-            Alege designul
+            CUMPĂRĂ UN DESIGN
           </p>
           <p>
             Răsfoiește colecția noastră de invitații, meniuri, carduri și
@@ -39,7 +39,7 @@ const OurPolicy = () => {
             alt="icon"
           />
           <p className="text-[#416387] uppercase text-[18px] font-medium mb-3">
-            Plătește și descarcă
+            Descarcă PDF-ul
           </p>
           <p>
             Finalizează comanda și descarcă PDF-ul tău personalizat, gata de

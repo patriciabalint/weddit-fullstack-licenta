@@ -9,25 +9,33 @@ import cartRouter from './routes/cartRoute.js';
 import orderRouter from './routes/orderRoute.js';
 import designRoute from './routes/designRoute.js';
 
-// App Config
 const app = express();
 const port = process.env.PORT || 4000;
+
 connectDB();
 connectCloudinary();
 
-// middlewares
 app.use(express.json());
 app.use(cors());
 
-// api endpoints
+// API routes
 app.use('/api/user', userRouter);
 app.use('/api/product', productRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/order', orderRouter);
 app.use('/api/design', designRoute);
 
+// Root route
 app.get('/', (req, res) => {
   res.send('API Working');
 });
 
-app.listen(port, () => console.log('Server started on PORT : ' + port));
+// Global error handler (optional dar recomandat)
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ success: false, message: 'Internal Server Error' });
+});
+
+app.listen(port, () => {
+  console.log(`Server started on PORT: ${port} - http://localhost:${port}`);
+});
