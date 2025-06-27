@@ -4,20 +4,26 @@
 
 @font-face {
   font-family: 'Neacademia';
-  src: url('./assets/fonts/NeacademiaDisplay-Regular.ttf') format('truetype');
+  src: url('/fonts/NeacademiaDisplay-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Neacademia';
-  src: url('./assets/fonts/NeacademiaDisplay-Italic.ttf') format('truetype');
+  src: url('/fonts/NeacademiaDisplay-Italic.ttf') format('truetype');
   font-weight: 400;
   font-style: italic;
 }
+
 @font-face {
   font-family: 'Amelia Giovani';
-  src: url('./fonts/Amelia Giovani.ttf') format('truetype');
+  src: url('/fonts/Amelia Giovani.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'English Script';
+  src: url('/fonts/English Script.TTF') format('truetype');
 }
 /* Fonturi Tailwind */
 * {
