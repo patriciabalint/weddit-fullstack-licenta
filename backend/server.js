@@ -19,11 +19,11 @@ app.use(express.json());
 app.use(
   cors({
     origin: [
-      'https://weddit-frontend.vercel.app',
-      'https://weddit-admin.vercel.app',
+      'http://localhost:5173', // pentru local
+      'https://weddit-frontend.vercel.app', // pentru frontend hostat pe Vercel
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
+    credentials: true, // doar dacă folosești cookies sau login cu sesiuni
   })
 );
 
@@ -45,6 +45,10 @@ app.use((err, req, res, next) => {
   res.status(500).json({ success: false, message: 'Internal Server Error' });
 });
 
-app.listen(port, () => {
-  console.log(`Server started on PORT: ${port} - http://localhost:${port}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, () => {
+    console.log(`Server started on PORT: ${port} - http://localhost:${port}`);
+  });
+}
+
+export default app;
