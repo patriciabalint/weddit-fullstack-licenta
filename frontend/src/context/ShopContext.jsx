@@ -1,10 +1,9 @@
-// frontend/src/context/ShopContext.js
-import { createContext, useEffect, useState, useCallback } from 'react'; // Adaugă useCallback
+import { createContext, useEffect, useState, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import PropTypes from 'prop-types';
-import { jwtDecode } from 'jwt-decode'; // <-- IMPORTĂ ASTA
+import { jwtDecode } from 'jwt-decode';
 
 export const ShopContext = createContext();
 
@@ -17,10 +16,9 @@ const ShopContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
   const [products, setProducts] = useState([]);
   const [token, setToken] = useState('');
-  const [userId, setUserId] = useState(null); // <-- ADAUGĂ ASTA: STATE PENTRU userId
+  const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
 
-  // FUNCTIE PENTRU LOGIN (este CRITICA pentru setarea tokenului si userId)
   const loginUser = async (url, data) => {
     try {
       const response = await axios.post(backendUrl + url, data);
@@ -28,10 +26,9 @@ const ShopContextProvider = (props) => {
         setToken(response.data.token);
         localStorage.setItem('token', response.data.token);
 
-        // Decodarea token-ului pentru a obține userId
         const decodedToken = jwtDecode(response.data.token);
-        setUserId(decodedToken.id); // <-- SETARE userId AICI
-        localStorage.setItem('userId', decodedToken.id); // <-- STOCARE userId ÎN LOCALSTORAGE
+        setUserId(decodedToken.id);
+        localStorage.setItem('userId', decodedToken.id);
 
         console.log(
           'ShopContext - Login Success - Token:',
@@ -54,18 +51,16 @@ const ShopContextProvider = (props) => {
     }
   };
 
-  // FUNCTIE PENTRU LOGOUT
   const logout = () => {
     localStorage.removeItem('token');
-    localStorage.removeItem('userId'); // <-- ELIMINĂ userId LA LOGOUT
+    localStorage.removeItem('userId');
     setToken('');
-    setUserId(null); // <-- SETARE userId LA NULL
-    setCartItems({}); // Curăță coșul la logout
+    setUserId(null);
+    setCartItems({});
     toast.success('Te-ai delogat cu succes!');
     navigate('/');
   };
 
-  // Functiile addToCart, getCartCount, getCartAmount raman la fel, dar le voi include pentru completitudine
   const addToCart = async (itemId) => {
     let cartData = structuredClone(cartItems);
     if (!cartData[itemId]) {
@@ -102,7 +97,6 @@ const ShopContextProvider = (props) => {
     return total;
   };
 
-  // Funcții care depind de backendUrl sau de alte state-uri, înfășurate în useCallback
   const getProductsData = useCallback(async () => {
     try {
       const response = await axios.get(backendUrl + '/api/product/list');
@@ -115,16 +109,15 @@ const ShopContextProvider = (props) => {
       console.log(error);
       toast.error(error.message);
     }
-  }, [backendUrl]); // Dependența: backendUrl
+  }, [backendUrl]);
 
   const getUserCart = useCallback(
     async (current_token) => {
-      // Argumentul 'token' redenumit 'current_token' pentru claritate
       try {
         const response = await axios.post(
           backendUrl + '/api/cart/get',
           {},
-          { headers: { Authorization: `Bearer ${current_token}` } } // Folosește current_token
+          { headers: { Authorization: `Bearer ${current_token}` } }
         );
         if (response.data.success) {
           setCartItems(response.data.cartData);
@@ -135,21 +128,19 @@ const ShopContextProvider = (props) => {
       }
     },
     [backendUrl]
-  ); // Dependența: backendUrl
+  );
 
-  // useEffect pentru a apela getProductsData o singură dată la montare
   useEffect(() => {
     console.log('ShopContext - useEffect [getProductsData] is running.');
     getProductsData();
-  }, [getProductsData]); // Dependența: getProductsData (pentru a apela doar când se schimbă funcția)
+  }, [getProductsData]);
 
-  // useEffect pentru a verifica token-ul și a încărca coșul la inițializare/schimbare token
   useEffect(() => {
     console.log(
       'ShopContext - useEffect [token, userId, getUserCart] is running.'
     );
     const localToken = localStorage.getItem('token');
-    const localUserId = localStorage.getItem('userId'); // Preluăm userId din localStorage
+    const localUserId = localStorage.getItem('userId');
 
     console.log('ShopContext - localToken from localStorage:', localToken);
     console.log('ShopContext - localUserId from localStorage:', localUserId);
@@ -157,14 +148,12 @@ const ShopContextProvider = (props) => {
     if (localToken) {
       setToken(localToken);
       if (localUserId) {
-        // Dacă userId există deja în localStorage, folosește-l
         setUserId(localUserId);
       } else {
-        // Altfel, încearcă să-l decodifici din token (fallback, ar trebui să existe mereu)
         try {
           const decodedToken = jwtDecode(localToken);
           setUserId(decodedToken.id);
-          localStorage.setItem('userId', decodedToken.id); // Stochează userId dacă a fost decodat acum
+          localStorage.setItem('userId', decodedToken.id);
           console.log(
             'ShopContext - UserId decoded from token (fallback):',
             decodedToken.id
@@ -174,7 +163,6 @@ const ShopContextProvider = (props) => {
             'ShopContext - Eroare la decodarea token-ului din localStorage:',
             e
           );
-          // Curăță token-ul invalid
           localStorage.removeItem('token');
           localStorage.removeItem('userId');
           setToken('');
@@ -184,11 +172,10 @@ const ShopContextProvider = (props) => {
           );
         }
       }
-      getUserCart(localToken); // Apelează getUserCart cu token-ul preluat
+      getUserCart(localToken);
     }
-  }, [getUserCart]); // Dependențe: getUserCart (și eventual token, dar deja e gestionat în if-ul de mai sus)
+  }, [getUserCart]);
 
-  // Obiectul `value` expus prin context
   const value = {
     products,
     currency,

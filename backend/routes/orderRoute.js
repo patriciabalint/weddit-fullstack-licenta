@@ -11,14 +11,14 @@ import authUser from '../middleware/auth.js';
 
 const orderRouter = express.Router();
 
-// Admin Features
+// Admin
 orderRouter.get('/list', adminAuth, allOrders);
 orderRouter.post('/status', adminAuth, updateStatus);
 
-// Payment Features
+// Payment
 orderRouter.post('/stripe', authUser, placeOrderStripe);
 
-// User Feature
+// User
 orderRouter.post('/userorders', authUser, userOrders);
 
 // verify payment

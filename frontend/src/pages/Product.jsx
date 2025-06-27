@@ -26,9 +26,9 @@ const Product = () => {
 
   return productData ? (
     <div className="border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100">
-      {/*----------- Product Data-------------- */}
+      {/*Product Data */}
       <div className="flex gap-12 sm:gap-12 flex-col sm:flex-row">
-        {/*---------- Product Images------------- */}
+        {/*Product Images*/}
         <div className="flex-1 flex flex-col-reverse gap-1 sm:flex-row sm:gap-4">
           <div className="flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full">
             {productData.image.map((item, index) => (
@@ -46,7 +46,7 @@ const Product = () => {
           </div>
         </div>
 
-        {/* -------- Product Info ---------- */}
+        {/*Product Info*/}
         <div className="flex-1">
           <h1 className="font-medium text-2xl mt-2 uppercase text-[#515F6E] tracking-[0.05em]">
             {productData.name}
@@ -82,7 +82,7 @@ const Product = () => {
         </div>
       </div>
 
-      {/* ---------- Description & Review Section ------------- */}
+      {/*Description & Review Section*/}
       <div className="mt-20">
         <div className="flex">
           <b className="border px-5 py-3 text-sm text-[#515F6E]">Description</b>
@@ -107,7 +107,7 @@ const Product = () => {
         </div>
       </div>
 
-      {/* --------- display related products ---------- */}
+      {/*display related products*/}
 
       <RelatedProducts
         category={productData.category}

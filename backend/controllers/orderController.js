@@ -1,11 +1,12 @@
 import orderModel from '../models/orderModel.js';
 import userModel from '../models/userModel.js';
 import Stripe from 'stripe';
+import Design from '../models/designModel.js';
 
 const currency = 'ron';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Creare comandă + Stripe session
+// Creare comandă + Stripe
 const placeOrderStripe = async (req, res) => {
   try {
     const { items, amount, address } = req.body;
@@ -101,10 +102,22 @@ const allOrders = async (req, res) => {
 // User: comenzile proprii
 const userOrders = async (req, res) => {
   try {
-    const userId = req.user.id; // Preluat din token
+    const userId = req.user.id;
     const orders = await orderModel.find({ userId });
+
+    for (const order of orders) {
+      for (const item of order.items) {
+        const design = await Design.findOne({
+          userId,
+          productId: item._id,
+        });
+        item.hasBeenEdited = design?.hasBeenEdited || false;
+      }
+    }
+
     res.json({ success: true, orders });
   } catch (error) {
+    console.error('Eroare la încărcarea comenzilor:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

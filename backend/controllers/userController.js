@@ -8,7 +8,6 @@ const createToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET);
 };
 
-// Route for user login
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -23,8 +22,8 @@ const loginUser = async (req, res) => {
 
     if (isMatch) {
       const token = createToken(user._id);
-      // TRIMITEREA userId CATRE FRONTEND ESTE ESENTIALA AICI
-      res.json({ success: true, token, userId: user._id }); // <-- MODIFICAT AICI
+
+      res.json({ success: true, token, userId: user._id });
     } else {
       res.json({ success: false, message: 'Invalid credentials' });
     }
@@ -34,18 +33,15 @@ const loginUser = async (req, res) => {
   }
 };
 
-// Route for user register
 const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // checking user already exists or not
     const exists = await userModel.findOne({ email });
     if (exists) {
       return res.json({ success: false, message: 'User already exists' });
     }
 
-    // validating email format & strong password
     if (!validator.isEmail(email)) {
       return res.json({
         success: false,
@@ -72,15 +68,13 @@ const registerUser = async (req, res) => {
     const user = await newUser.save();
 
     const token = createToken(user._id);
-    // TRIMITEREA userId CATRE FRONTEND ESTE ESENTIALA AICI
-    res.json({ success: true, token, userId: user._id }); // <-- MODIFICAT AICI
+    res.json({ success: true, token, userId: user._id });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
   }
 };
 
-// Route for admin login
 const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;

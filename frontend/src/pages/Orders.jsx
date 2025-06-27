@@ -26,9 +26,11 @@ const Orders = () => {
           order.items.map((item) => {
             item['status'] = order.status;
             item['payment'] = order.payment;
+            item['productId'] = item._id;
 
             item['date'] = order.date;
             allOrdersItem.push(item);
+            console.log('ITEM:', item);
           });
         });
         setorderData(allOrdersItem.reverse());
@@ -55,9 +57,9 @@ const Orders = () => {
       </div>
 
       <div>
-        {orderData.map((item) => (
+        {orderData.map((item, index) => (
           <div
-            key={item._id}
+            key={`${item._id}-${index}`}
             className="py-4 border-t border-b text-gray-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
           >
             <div className="flex items-start gap-6 text-sm">
@@ -82,9 +84,15 @@ const Orders = () => {
             </div>
             <div className="md:w-1/2 flex justify-between">
               <div className="flex items-center gap-2"></div>
-              <Link to={`/editor/${item._id}`}>
-                <button className="text-white px-8 py-2.5 text-sm bg-[#6385A8] tracking-wider mt-6 uppercase hover:shadow-sm hover:bg-gray-200 transition">
-                  Editează
+              <Link to={`/editor/${item.productId}`}>
+                <button
+                  className={` w-36 text-white px-8 py-2.5 text-sm tracking-wider mt-6 uppercase hover:shadow-sm transition ${
+                    item.hasBeenEdited
+                      ? 'bg-accent hover:bg-gray-200'
+                      : 'bg-[#6385A8] hover:bg-gray-200'
+                  }`}
+                >
+                  {item.hasBeenEdited ? 'Reeditează' : 'Editează'}
                 </button>
               </Link>
             </div>

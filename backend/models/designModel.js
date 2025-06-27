@@ -13,6 +13,7 @@ const designSchema = new mongoose.Schema(
       required: true,
     },
     designData: { type: mongoose.Schema.Types.Mixed, required: true },
+    hasBeenEdited: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

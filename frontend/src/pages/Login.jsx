@@ -13,7 +13,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
 
-  const navigate = useNavigate(); // Inițializăm useNavigate aici
+  const navigate = useNavigate();
 
   const onSubmitHandler = async (event) => {
     event.preventDefault(); // Oprește reîncărcarea paginii
@@ -38,10 +38,8 @@ const Login = () => {
         setToken(response.data.token);
         localStorage.setItem('token', response.data.token);
 
-        // --- LINIILE CRUCIALE PENTRU userId ---
-        setUserId(response.data.userId); // Setează userId în context
+        setUserId(response.data.userId);
         localStorage.setItem('userId', response.data.userId); // Salvează userId în localStorage
-        // --- END userId MODIFICARE ---
 
         toast.success(
           currentState === 'Login'
@@ -53,7 +51,7 @@ const Login = () => {
         toast.error(response.data.message);
       }
     } catch (error) {
-      console.error('Authentication error:', error); // Folosește console.error pentru erori
+      console.error('Authentication error:', error);
       toast.error(
         error.response?.data?.message ||
           error.message ||
@@ -63,16 +61,15 @@ const Login = () => {
   };
 
   useEffect(() => {
-    // Verifică dacă tokenul există deja în localStorage la încărcarea componentei
     const storedToken = localStorage.getItem('token');
     const storedUserId = localStorage.getItem('userId');
 
     if (storedToken && storedUserId) {
       setToken(storedToken);
       setUserId(storedUserId);
-      navigate('/'); // Redirecționează dacă ești deja autentificat
+      navigate('/');
     }
-  }, [setToken, setUserId, navigate]); // Adaugă setToken, setUserId și navigate ca dependențe
+  }, [setToken, setUserId, navigate]);
 
   return (
     <div className="pt-10 border-t border-gray-200">

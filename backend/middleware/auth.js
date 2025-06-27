@@ -14,7 +14,7 @@ const authUser = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { id: decoded.id }; // extensibil, mai curat
+    req.user = { id: decoded.id };
     //console.log('Auth Middleware: Token decoded, user attached:', req.user.id);
     next();
   } catch (error) {

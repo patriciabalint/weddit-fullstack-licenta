@@ -1,16 +1,15 @@
 import { useState, useRef, useEffect, useContext, useCallback } from 'react';
 import { Rnd } from 'react-rnd';
-import panou from '../assets/panou.png'; // Imaginea de bază pentru template
+import panou from '../assets/panou.png';
+import monogramaImage from '../assets/monogramaImage.png';
 import { assets } from '../assets/assets';
 import { ShopContext } from '../context/ShopContext';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { generatePDF } from '../utils/generatePDF';
 import { toast } from 'react-toastify';
 
-// Asigură-te că ID-urile se potrivesc cu cele din baza ta de date pentru produse
 const ALL_PRESETS = {
-  '684dae795cfca6cf3db74e43': {
-    // Exemplu de Product ID (ID-ul produsului pentru panou)
+  '6851c7a245276ede30e9fbaf': {
     image: panou,
     fields: [
       {
@@ -45,17 +44,52 @@ const ALL_PRESETS = {
       },
     ],
   },
-  // ADAUGĂ AICI ALTE PRESET-URI PENTRU CELELALTE DESIGN-URI ALE TALE
+  '6851c67745276ede30e9fba9': {
+    image: monogramaImage,
+    width: 500,
+    height: 500,
+    fields: [
+      {
+        id: 1,
+        label: 'Inițială stânga',
+        value: 'I',
+        x: 120,
+        y: 130,
+        fontSize: 160,
+        fontFamily: 'serif',
+        color: '#AFA056',
+      },
+      {
+        id: 2,
+        label: 'Separator',
+        value: '|',
+        x: 200,
+        y: 120,
+        fontSize: 160,
+        fontFamily: 'serif',
+        color: '#AFA056',
+      },
+      {
+        id: 3,
+        label: 'Inițială dreapta',
+        value: 'A',
+        x: 250,
+        y: 130,
+        fontSize: 160,
+        fontFamily: 'serif',
+        color: '#AFA056',
+      },
+    ],
+  },
+  // AICI ALTE PRESET-URI PENTRU CELELALTE DESIGN-URI
 };
 
 export default function Editor() {
   const { productId } = useParams();
-  // Extragem doar ce este folosit DIRECT în Editor.js din context.
-  // setToken și setCartItems sunt folosite în ShopContext.jsx, nu aici.
+
   const { token, backendUrl, getCartCount, logout } = useContext(ShopContext);
 
-  const currentPreset =
-    ALL_PRESETS[productId] || ALL_PRESETS['684dae795cfca6cf3db74e43'];
+  const currentPreset = ALL_PRESETS[productId];
 
   const [fields, setFields] = useState(
     currentPreset ? currentPreset.fields : []
@@ -71,8 +105,16 @@ export default function Editor() {
 
   const navigate = useNavigate();
 
-  const editorWidth = 400;
-  const editorHeight = 600;
+  const [editorWidth, setEditorWidth] = useState(400);
+  const [editorHeight, setEditorHeight] = useState(600);
+
+  useEffect(() => {
+    const preset = ALL_PRESETS[productId];
+    if (preset) {
+      setEditorWidth(preset.width || 400);
+      setEditorHeight(preset.height || 600);
+    }
+  }, [productId]);
   const centerX = editorWidth / 2;
   const centerY = editorHeight / 2;
 
@@ -127,9 +169,8 @@ export default function Editor() {
     };
     setFields((prev) => [...prev, newField]);
     setSelectedId(newField.id);
-  }, [fields]); // Adaugă 'fields' ca dependență pentru a asigura saveStateForUndo corect
+  }, [fields]);
 
-  // DEFINIREA FUNCȚIEI deleteField (rezolvă 'deleteField is not defined')
   const deleteField = useCallback(
     (id) => {
       saveStateForUndo();
@@ -137,7 +178,7 @@ export default function Editor() {
       setSelectedId(null);
     },
     [fields]
-  ); // Adaugă 'fields' ca dependență pentru a asigura saveStateForUndo corect
+  );
 
   const handleSaveDesign = async () => {
     if (!token || !productId) {
@@ -175,16 +216,22 @@ export default function Editor() {
   };
 
   const loadDesign = useCallback(async () => {
-    if (!token || !productId) {
-      setFields(
-        ALL_PRESETS[productId]?.fields ||
-          ALL_PRESETS['684dae795cfca6cf3db74e43'].fields
-      );
-      toast.info(
-        'Nu ești autentificat sau nu s-a găsit un design salvat pentru acest produs.'
-      );
+    if (!productId) {
+      toast.error('Produsul nu este valid.');
       return;
     }
+    // Dacă nu există preset pentru acest produs și nu suntem logați → design indisponibil
+    if (!token && !ALL_PRESETS[productId]) {
+      setFields([]);
+      toast.error('Designul pentru acest produs nu este disponibil momentan.');
+      return;
+    }
+
+    if (!token && ALL_PRESETS[productId]) {
+      setFields(ALL_PRESETS[productId].fields);
+      return;
+    }
+
     try {
       const response = await fetch(backendUrl + '/api/design/load', {
         method: 'POST',
@@ -196,21 +243,33 @@ export default function Editor() {
       });
 
       const data = await response.json();
-      if (data.success && data.designData && data.designData.length > 0) {
+
+      if (data.success && Array.isArray(data.designData)) {
         setFields(data.designData);
-        //toast.info('Designul salvat anterior a fost încărcat.');
       } else {
-        setFields(
-          ALL_PRESETS[productId]?.fields ||
-            ALL_PRESETS['684dae795cfca6cf3db74e43'].fields
-        );
-        //toast.info('Nu s-a găsit un design salvat pentru acest produs.');
+        // Dacă nu s-a salvat designul, dar produsul are preset, îl folosim
+        if (ALL_PRESETS[productId]) {
+          setFields(ALL_PRESETS[productId].fields);
+        } else {
+          setFields([]);
+          toast.error(
+            'Designul pentru acest produs nu este disponibil momentan.'
+          );
+        }
       }
     } catch (error) {
       console.error('Eroare la încărcarea designului:', error);
-      //toast.error('Eroare de rețea la încărcarea designului.');
+      toast.error('A apărut o eroare la încărcarea designului.');
     }
   }, [token, productId, backendUrl]);
+
+  useEffect(() => {
+    if (productId && !ALL_PRESETS[productId]) {
+      console.log(
+        '[INFO] Design preset inexistent — așteptăm dacă există unul salvat...'
+      );
+    }
+  }, [productId]);
 
   // useEffect pentru a încărca designul la montarea componentei
   useEffect(() => {
@@ -247,6 +306,8 @@ export default function Editor() {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleUndo, handleRedo]);
+
+  if (!productId || !currentPreset) return null;
 
   return (
     <div className="w-full bg-white">
@@ -347,12 +408,12 @@ export default function Editor() {
         </div>
         <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gray-300 z-10" />
       </header>
-
-      <section className="bg-[#f5f5f5] w-screen relative left-1/2 -ml-[50vw] right-1/2 -mr-[50vw] py-10">
+      <section className="bg-[#f5f5f5] w-screen min-h-screen relative left-1/2 -ml-[50vw] right-1/2 -mr-[50vw] pt-10 pb-20 flex justify-center">
         <div className="flex justify-center">
           <div
             ref={editorRef}
-            className="relative w-[400px] h-[600px] bg-white shadow border"
+            style={{ width: `${editorWidth}px`, height: `${editorHeight}px` }}
+            className="relative bg-white shadow border"
           >
             {/* Buton ADAUGĂ TEXT */}
             <button
@@ -365,7 +426,8 @@ export default function Editor() {
             {/* Zona de export PDF */}
             <div
               ref={downloadRef}
-              className="relative w-[400px] h-[600px] bg-white shadow border"
+              style={{ width: `${editorWidth}px`, height: `${editorHeight}px` }}
+              className="relative bg-white shadow border"
             >
               <img
                 src={currentPreset.image}
@@ -463,7 +525,7 @@ export default function Editor() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteField(f.id); // Apelăm funcția definită
+                        deleteField(f.id);
                       }}
                       className="absolute -top-2 -right-2 bg-red-500 text-white w-5 h-5 text-xs rounded-full shadow hover:bg-red-700 z-10 flex items-center justify-center"
                     >

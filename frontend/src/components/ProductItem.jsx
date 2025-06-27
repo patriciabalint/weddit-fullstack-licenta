@@ -12,7 +12,7 @@ const ProductItem = ({ id, image, name, price }) => {
       to={`/product/${id}`}
       className="text-muted cursor-pointer mb-6"
     >
-      <div className="overflow-hidden h-[270px] w-[235px] flex items-center justify-center">
+      <div className="overflow-hidden h-[270px] w-[235px] w-full flex items-center justify-center">
         <img
           className="hover:scale-110 transition ease-in-out duration-300 w-full h-full object-cover"
           src={image[0]}
@@ -20,11 +20,10 @@ const ProductItem = ({ id, image, name, price }) => {
         />
       </div>
 
-      <div className="flex justify-between items-center pt-3 pb-1">
-        <p className="text-[17px] font-regular ">{name}</p>
+      <div className="pt-3 pb-1">
+        <p className="text-[17px] font-regular mb-1">{name}</p>
         <p className="text-[16px] text-accent font-regular uppercase">
-          {price}
-          <span className="text-[12px] ml-1">{currency}</span>
+          {price} <span className="text-[12px] ml-1">{currency}</span>
         </p>
       </div>
     </Link>

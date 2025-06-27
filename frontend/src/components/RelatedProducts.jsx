@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { ShopContext } from '../context/ShopContext';
 import Title from './Title';
 import ProductItem from './ProductItem';
+import PropTypes from 'prop-types';
 
 const RelatedProducts = ({ category, subCategory }) => {
   const { products } = useContext(ShopContext);
@@ -26,7 +27,7 @@ const RelatedProducts = ({ category, subCategory }) => {
         <Title text1={'RELATED'} text2={'PRODUCTS'} />
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 p-2">
         {related.map((item, index) => (
           <ProductItem
             key={index}
@@ -39,6 +40,10 @@ const RelatedProducts = ({ category, subCategory }) => {
       </div>
     </div>
   );
+};
+RelatedProducts.propTypes = {
+  category: PropTypes.string.isRequired,
+  subCategory: PropTypes.string.isRequired,
 };
 
 export default RelatedProducts;

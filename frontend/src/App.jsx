@@ -28,10 +28,8 @@ const App = () => {
       }
     >
       <ToastContainer />
-
       {!isEditorPage && <Navbar />}
       {!isEditorPage && <SearchBar />}
-
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/collection" element={<Collection />} />
@@ -45,7 +43,6 @@ const App = () => {
         <Route path="/test-editor" element={<Editor />} />
         <Route path="/editor/:productId" element={<Editor />} />
       </Routes>
-
       {!isEditorPage && <Footer />}
     </div>
   );

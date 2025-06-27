@@ -1,16 +1,15 @@
 import BestSeller from '../components/BestSeller';
 import Categories from '../components/Categories';
 import Hero from '../components/Hero';
-import OurPolicy from '../components/OurPolicy';
+import StepsSection from '../components/StepsSection';
 
 const Home = () => {
   return (
     <div>
       <Hero />
       <Categories />
-
       <BestSeller />
-      <OurPolicy />
+      <StepsSection />
     </div>
   );
 };

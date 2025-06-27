@@ -38,9 +38,6 @@ const Collection = () => {
       );
     }
 
-    // ✨ Filtrare după categoria primită din homepage
-
-    // Filtrare după checkboxuri (dacă sunt selectate)
     if (category.length > 0) {
       productsCopy = productsCopy.filter((item) =>
         category.includes(item.category)
@@ -84,7 +81,6 @@ const Collection = () => {
 
   const location = useLocation();
 
-  // Preluăm categoria inițială doar la montare
   useEffect(() => {
     if (location.state?.category) {
       setCategory((prev) => {
@@ -94,7 +90,6 @@ const Collection = () => {
         return prev;
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -233,7 +228,7 @@ const Collection = () => {
         </div>
 
         {/* Map Products */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 gap-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 gap-y-6">
           {filterProducts.map((item, index) => (
             <ProductItem
               key={index}

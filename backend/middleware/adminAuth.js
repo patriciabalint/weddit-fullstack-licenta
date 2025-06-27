@@ -12,14 +12,14 @@ const adminAuth = (req, res, next) => {
     const token = authHeader.split(' ')[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Verifici rolul din token
+    // Verificare rolul din token
     if (decoded.role !== 'admin') {
       return res
         .status(403)
         .json({ success: false, message: 'Access denied, admin only.' });
     }
 
-    req.user = decoded; // Salvezi userul decodat pentru rute
+    req.user = decoded; // Salvare userul decodat pentru rute
     next();
   } catch (error) {
     console.error('adminAuth error:', error);

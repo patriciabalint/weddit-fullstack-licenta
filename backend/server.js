@@ -7,7 +7,7 @@ import userRouter from './routes/userRoute.js';
 import productRouter from './routes/productRoute.js';
 import cartRouter from './routes/cartRoute.js';
 import orderRouter from './routes/orderRoute.js';
-import designRoute from './routes/designRoute.js';
+import designRouter from './routes/designRoute.js';
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -23,14 +23,14 @@ app.use('/api/user', userRouter);
 app.use('/api/product', productRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/order', orderRouter);
-app.use('/api/design', designRoute);
+app.use('/api/design', designRouter);
 
 // Root route
 app.get('/', (req, res) => {
   res.send('API Working');
 });
 
-// Global error handler (optional dar recomandat)
+// Global error handler
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
   res.status(500).json({ success: false, message: 'Internal Server Error' });

@@ -58,31 +58,36 @@ const Navbar = () => {
           alt=""
         />
 
-        <div className="group relative">
-          <img
-            onClick={() => (token ? null : navigate('/login'))}
-            className="w-4 cursor-pointer"
-            src={assets.profile_icon}
-            alt=""
-          />
-          {/* Dropdown Menu */}
-          {token && (
+        {token ? (
+          <div className="group relative">
+            <img
+              className="w-4 cursor-pointer"
+              src={assets.profile_icon}
+              alt=""
+            />
+            {/* Dropdown Menu */}
             <div className="group-hover:block hidden absolute dropdown-menu right-0 pt-2 z-50">
-              <div className="flex flex-col gap-2 w-36 py-3 px-5  bg-slate-100 text-gray-500 rounded">
-                <p className="cursor-pointer hover:text-black">My Profile</p>
+              <div className="flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 rounded">
                 <p
                   onClick={() => navigate('/orders')}
                   className="cursor-pointer hover:text-black"
                 >
-                  Orders
+                  Comenzi
                 </p>
                 <p onClick={logout} className="cursor-pointer hover:text-black">
                   Logout
                 </p>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => navigate('/login')}
+            className="text-sm px-3 py-1 bg-[#8AA4BE] text-white hover:bg-[#5f7993] hover:text-white transition px-6 py-2"
+          >
+            LOGIN
+          </button>
+        )}
         <Link to="/cart" className="relative">
           <img src={assets.cart_icon} className="w-4 min-w-4" alt="" />
           <p className="absolute right-[-5px] bottom-[-5px] bg-[#6385A8] text-white text-[8px] w-4 h-4 flex items-center justify-center rounded-full">
@@ -97,10 +102,10 @@ const Navbar = () => {
         />
       </div>
 
-      {/* Sidebar menu for small screens */}
+      {/* Sidebar menu - small screens */}
       <div
-        className={`absolute top-0 right-0 bottom-0 overflow-hidden bg-white transition-all ${
-          visible ? 'w-full' : 'w-0'
+        className={`fixed inset-0 z-50 bg-white transition-all duration-300 ${
+          visible ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         <div className="flex flex-col text-gray-600">
@@ -112,32 +117,39 @@ const Navbar = () => {
             <p>Back</p>
           </div>
           <NavLink
-            onClick={() => setVisible(false)}
-            className="py-2 pl-6 border"
             to="/"
-          >
-            HOME
-          </NavLink>
-          <NavLink
             onClick={() => setVisible(false)}
-            className="py-2 pl-6 border"
+            className={({ isActive }) =>
+              `py-2 pl-6 border transition-colors duration-200 ${
+                isActive ? 'bg-[#6385A8] text-white' : 'text-[#576B7F]'
+              }`
+            }
+          >
+            ACASĂ
+          </NavLink>
+
+          <NavLink
             to="/collection"
-          >
-            COLLECTION
-          </NavLink>
-          <NavLink
             onClick={() => setVisible(false)}
-            className="py-2 pl-6 border"
+            className={({ isActive }) =>
+              `py-2 pl-6 border transition-colors duration-200 ${
+                isActive ? 'bg-[#6385A8] text-white' : 'text-[#576B7F]'
+              }`
+            }
+          >
+            COLECȚII
+          </NavLink>
+
+          <NavLink
             to="/about"
-          >
-            ABOUT
-          </NavLink>
-          <NavLink
             onClick={() => setVisible(false)}
-            className="py-2 pl-6 border"
-            to="/contact"
+            className={({ isActive }) =>
+              `py-2 pl-6 border transition-colors duration-200 ${
+                isActive ? 'bg-[#6385A8] text-white' : 'text-[#576B7F]'
+              }`
+            }
           >
-            CONTACT
+            DESPRE & CONTACT
           </NavLink>
         </div>
       </div>

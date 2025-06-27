@@ -5,8 +5,8 @@ import Design from '../models/designModel.js';
 const designRouter = express.Router();
 
 designRouter.post('/save', authMiddleware, async (req, res) => {
-  const userId = req.user?.id || req.userId; // Flexibil, în funcție de middleware
-  const { productId, designData } = req.body; // Schimbat din fields => designData
+  const userId = req.user?.id || req.userId;
+  const { productId, designData } = req.body;
 
   if (!userId || !productId || !designData) {
     return res.status(400).json({
@@ -18,7 +18,7 @@ designRouter.post('/save', authMiddleware, async (req, res) => {
   try {
     const design = await Design.findOneAndUpdate(
       { userId, productId },
-      { designData },
+      { designData, hasBeenEdited: true },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
 
