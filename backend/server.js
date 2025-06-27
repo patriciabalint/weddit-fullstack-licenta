@@ -16,7 +16,16 @@ connectDB();
 connectCloudinary();
 
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      'https://weddit-frontend.vercel.app',
+      'https://weddit-admin.vercel.app',
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  })
+);
 
 // API routes
 app.use('/api/user', userRouter);
