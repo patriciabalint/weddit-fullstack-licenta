@@ -1,7 +1,7 @@
 import BestSeller from '../components/BestSeller';
 import Categories from '../components/Categories';
 import Hero from '../components/Hero';
-import StepsSection from '../components/StepsSection';
+import OurPolicy from '../components/OurPolicy';
 
 const Home = () => {
   return (
@@ -9,7 +9,7 @@ const Home = () => {
       <Hero />
       <Categories />
       <BestSeller />
-      <StepsSection />
+      <OurPolicy />
     </div>
   );
 };
