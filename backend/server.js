@@ -19,8 +19,10 @@ app.use(express.json());
 app.use(
   cors({
     origin: [
-      'http://localhost:5173', // pentru local
-      'https://weddit-frontend.vercel.app', // pentru frontend hostat pe Vercel
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'https://weddit-frontend.vercel.app',
+      'https://weddit-admin.vercel.app',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true, // doar dacă folosești cookies sau login cu sesiuni
